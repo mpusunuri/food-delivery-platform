@@ -22,50 +22,61 @@ jobs:
   # ================================================
   # JOB 0: SonarCloud Quality Analysis
   # ================================================
-  sonarcloud:
-    name: SonarCloud Quality Analysis
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+  # In .github/workflows/ci.yml, update the SonarCloud job:
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+sonarcloud:
+  name: SonarCloud Quality Analysis
+  runs-on: ubuntu-latest
+  if: github.event_name == 'push' || github.event_name == 'pull_request'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Install Backend Dependencies
-        run: |
-          cd backend
-          npm ci
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-      - name: Run Tests with Coverage
-        run: |
-          cd backend
-          npm test -- --coverage --coverageReporters=lcov
-        env:
-          DB_HOST: localhost
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: fooddelivery
-          NODE_ENV: test
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        npm ci
 
-      - name: Display Coverage Report (Debug)
-        run: |
-          echo "=== Checking coverage files ==="
-          ls -la backend/coverage/ || echo "No coverage directory!"
-          echo "=== Looking for lcov.info ==="
-          find backend -name "lcov.info" || echo "lcov.info not found!"
+    - name: Run Tests with Coverage
+      run: |
+        cd backend
+        npm test -- --coverage --coverageReporters=lcov
+      env:
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        DB_NAME: fooddelivery
+        NODE_ENV: test
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Display Coverage Report (Debug)
+      run: |
+        echo "=== Checking coverage files ==="
+        ls -la backend/coverage/ || echo "No coverage directory!"
+        echo "=== Looking for lcov.info ==="
+        find backend -name "lcov.info" || echo "lcov.info not found!"
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.organization=food-delivery-platform
+          -Dsonar.projectKey=mpusunuri_food-delivery-platform
+          -Dsonar.sources=backend/src,frontend/src
+          -Dsonar.tests=backend/src,frontend/src
+          -Dsonar.test.inclusions=**/*.test.js
+          -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info
+          -Dsonar.exclusions=**/node_modules/**,**/build/**,**/coverage/**,**/*.test.js
 
   # ================================================
   # JOB 1: Backend Testing
