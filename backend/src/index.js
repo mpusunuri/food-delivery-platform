@@ -51,5 +51,5 @@ if (require.main === module) {
     });
 }
 
-// ✅ IMPORTANT: Export app for testing
+// Export app for testing
 module.exports = app;
