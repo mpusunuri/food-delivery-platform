@@ -42,12 +42,12 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -71,10 +71,11 @@ jobs:
 
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: backend/coverage/
+          retention-days: 7
 
   # ================================================
   # JOB 2: Docker Build & Push
@@ -87,23 +88,23 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           version: latest
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Backend
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
@@ -114,7 +115,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and Push Frontend
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./frontend
           push: true
@@ -142,10 +143,11 @@ jobs:
 
       - name: Upload Trivy Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-reports
           path: trivy-*.sarif
+          retention-days: 7
 
   # ================================================
   # JOB 3: Security Scanning (Backend)
@@ -158,7 +160,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -173,10 +175,11 @@ jobs:
 
       - name: Upload Backend Scan Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-backend-code
           path: trivy-backend-code.sarif
+          retention-days: 7
 
   # ================================================
   # JOB 4: Security Scanning (Frontend)
@@ -189,7 +192,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -204,10 +207,11 @@ jobs:
 
       - name: Upload Frontend Scan Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-frontend-code
           path: trivy-frontend-code.sarif
+          retention-days: 7
 
   # ================================================
   # JOB 5: Deployment (Coming in Week 4)
@@ -222,10 +226,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
