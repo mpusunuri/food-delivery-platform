@@ -68,7 +68,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=food-delivery-platform
+            -Dsonar.organization=mpusunuri
             -Dsonar.projectKey=mpusunuri_food-delivery-platform
             -Dsonar.sources=backend/src,frontend/src
             -Dsonar.tests=backend/src,frontend/src
