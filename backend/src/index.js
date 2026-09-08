@@ -43,7 +43,13 @@ app.get('/db-test', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`✅ Backend running on http://localhost:${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
-});
+// Only start server if this file is run directly
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`✅ Backend running on http://localhost:${PORT}`);
+        console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    });
+}
+
+// ✅ IMPORTANT: Export app for testing
+module.exports = app;
